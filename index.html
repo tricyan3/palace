@@ -1,0 +1,959 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <base href="$FLUTTER_BASE_HREF">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description"
+    content="PALACE - A beautiful, cross-platform wallpaper 2\manager. Organize, automate, and enjoy stunning wallpapers on Windows, macOS, Linux, Android, and iOS.">
+  <meta name="keywords"
+    content="wallpaper, wallpaper manager, lofi, desktop wallpaper, android wallpaper, live wallpaper, wallpaper app">
+  <title>PALACE - Cross-Platform Wallpaper Manager</title>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/components.css">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="images/app-icon.png">
+
+  <!-- PWA & Mobile -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-title" content="PALACE">
+  <link rel="apple-touch-icon" href="icons/Icon-192.png">
+
+  <style>
+    /* SPA View Management */
+    .view-section {
+      display: none;
+      animation: fadeIn 0.3s ease-out;
+    }
+
+    .view-section.active {
+      display: block;
+    }
+
+    /* Loading Screen */
+    #loading-view {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: var(--color-bg);
+      z-index: 9999;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #loading-view.flex {
+      display: flex;
+    }
+
+    .loader-spinner {
+      width: 50px;
+      height: 50px;
+      border: 3px solid rgba(255, 255, 255, 0.1);
+      border-radius: 50%;
+      border-top-color: var(--color-primary);
+      animation: spin 1s ease-in-out infinite;
+      margin-bottom: var(--space-4);
+    }
+
+    .text-loading {
+      font-family: var(--font-display);
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      color: var(--color-text-secondary);
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    .fade-out {
+      opacity: 0;
+      transition: opacity 0.5s ease-out;
+      pointer-events: none;
+    }
+
+    /* Payment Styles */
+    .pricing-toggle {
+      display: flex;
+      background: var(--color-surface);
+      border-radius: var(--radius-lg);
+      padding: 4px;
+      margin-bottom: var(--space-6);
+      border: 1px solid var(--color-surface-border);
+    }
+
+    .pricing-toggle button {
+      flex: 1;
+      padding: var(--space-3) var(--space-4);
+      border: none;
+      background: transparent;
+      color: var(--color-text-muted);
+      font-size: var(--text-base);
+      font-weight: 600;
+      cursor: pointer;
+      border-radius: var(--radius-md);
+      transition: all 0.3s ease;
+    }
+
+    .pricing-toggle button.active {
+      background: var(--gradient-primary);
+      color: var(--color-text);
+      box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+    }
+
+    .pricing-toggle button:hover:not(.active) {
+      color: var(--color-text);
+    }
+
+    .price-display {
+      margin-bottom: var(--space-4);
+    }
+
+    .price-amount {
+      font-size: 3rem;
+      font-weight: 800;
+      background: var(--gradient-accent);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      line-height: 1.1;
+    }
+
+    .price-period {
+      font-size: var(--text-lg);
+      color: var(--color-text-muted);
+      margin-left: var(--space-1);
+    }
+
+    .price-savings {
+      display: inline-block;
+      padding: var(--space-1) var(--space-3);
+      background: linear-gradient(135deg, #10b981, #059669);
+      border-radius: var(--radius-full);
+      font-size: var(--text-sm);
+      font-weight: 600;
+      color: white;
+      margin-top: var(--space-2);
+    }
+
+    .price-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-2);
+      padding: var(--space-2) var(--space-4);
+      background: var(--gradient-accent);
+      border-radius: var(--radius-full);
+      font-size: var(--text-lg);
+      font-weight: 700;
+      color: var(--color-text);
+      margin-bottom: var(--space-4);
+    }
+
+    .payment-box {
+      max-width: 500px;
+      margin: 0 auto var(--space-8);
+      padding: var(--space-8);
+      background: var(--gradient-card);
+      border: 1px solid var(--color-surface-border);
+      border-radius: var(--radius-xl);
+      text-align: center;
+    }
+
+    .payment-box h3 {
+      margin-bottom: var(--space-2);
+    }
+
+    .payment-box p {
+      color: var(--color-text-muted);
+      margin-bottom: var(--space-6);
+    }
+
+    .divider {
+      display: flex;
+      align-items: center;
+      gap: var(--space-4);
+      margin: var(--space-6) 0;
+      color: var(--color-text-dim);
+      font-size: var(--text-sm);
+    }
+
+    .divider::before,
+    .divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--color-surface-border);
+    }
+
+    .verify-form {
+      display: flex;
+      gap: var(--space-3);
+    }
+
+    .verify-form input {
+      flex: 1;
+      padding: var(--space-3) var(--space-4);
+      background: var(--color-surface);
+      border: 1px solid var(--color-surface-border);
+      border-radius: var(--radius-md);
+      color: var(--color-text);
+      font-size: var(--text-base);
+    }
+
+    .verify-form input:focus {
+      outline: none;
+      border-color: var(--color-primary);
+    }
+
+    .verify-form input::placeholder {
+      color: var(--color-text-dim);
+    }
+
+    .success-box {
+      max-width: 700px;
+      margin: 0 auto var(--space-8);
+      padding: var(--space-8);
+      background: var(--gradient-card);
+      border: 2px solid var(--color-primary);
+      border-radius: var(--radius-xl);
+      text-align: center;
+    }
+
+    .success-icon {
+      font-size: 64px;
+      margin-bottom: var(--space-4);
+    }
+
+    .success-box h2 {
+      color: var(--color-primary-light);
+      margin-bottom: var(--space-2);
+    }
+
+    .error-message {
+      color: #ef4444;
+      font-size: var(--text-sm);
+      margin-top: var(--space-2);
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    @media (max-width: 768px) {
+      .verify-form {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ===== HEADER ===== -->
+  <header class="header" id="main-header">
+    <div class="header-content">
+      <a href="#" onclick="switchView('landing')" class="logo">
+        <img src="images/app-icon.png" alt="PALACE Logo">
+        <span>PALACE</span>
+      </a>
+
+      <nav class="nav">
+        <a href="#" onclick="switchView('landing')" class="nav-link active" id="nav-home">Home</a>
+        <a href="#" onclick="switchView('download')" class="nav-link" id="nav-download">Download</a>
+        <button onclick="startFlutterApp()" class="btn btn-primary btn-sm">Start Using</button>
+      </nav>
+
+      <button class="mobile-menu-btn" aria-label="Toggle menu" onclick="toggleMobileMenu()">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+
+    <!-- Mobile Navigation -->
+    <nav class="mobile-nav" id="mobileNav">
+      <a href="#" onclick="switchView('landing'); toggleMobileMenu()" class="nav-link active" id="mob-nav-home">Home</a>
+      <a href="#" onclick="switchView('download'); toggleMobileMenu()" class="nav-link"
+        id="mob-nav-download">Download</a>
+      <button onclick="startFlutterApp(); toggleMobileMenu()" class="btn btn-primary"
+        style="margin-top: var(--space-4); width: 100%;">Start Using</button>
+    </nav>
+  </header>
+
+  <!-- ===== LANDING VIEW ===== -->
+  <main id="landing-view" class="view-section active">
+    <!-- Hero Section -->
+    <section class="hero">
+      <div class="container">
+        <div class="hero-content">
+          <div class="hero-text animate-fade-in-up">
+            <div class="hero-badge">
+              ✨ <span>Cross-Platform</span> Wallpaper Manager
+            </div>
+            <h1>
+              Bring <span class="text-gradient">Beauty</span> to Your Desktop
+            </h1>
+            <p>
+              A powerful, feature-rich wallpaper manager that works everywhere.
+              Organize, automate, and enjoy stunning wallpapers on all your devices.
+            </p>
+            <div class="hero-buttons">
+              <button onclick="switchView('download')" class="btn btn-primary btn-lg">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                  <polyline points="7 10 12 15 17 10" />
+                  <line x1="12" y1="15" x2="12" y2="3" />
+                </svg>
+                Download Now
+              </button>
+              <button onclick="startFlutterApp()" class="btn btn-secondary btn-lg">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polygon points="5 3 19 12 5 21 5 3" />
+                </svg>
+                Try Web Version
+              </button>
+            </div>
+          </div>
+
+          <div class="hero-visual animate-fade-in animate-delay-2">
+            <div class="hero-image">
+              <img src="images/screenshots/screenshot-1.png" alt="PALACE App Screenshot">
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== PLATFORMS SECTION ===== -->
+    <section class="section" style="background: var(--color-bg-secondary);">
+      <div class="container">
+        <div class="section-header">
+          <h2>Available <span class="text-gradient">Everywhere</span></h2>
+          <p>One app, all your devices. PALACE works seamlessly across all major platforms.</p>
+        </div>
+
+        <div class="platform-badges">
+          <div class="platform-badge">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+              <path
+                d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.9-1.801" />
+            </svg>
+            Windows
+          </div>
+          <div class="platform-badge">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+              <path
+                d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm0 18c-4.418 0-8-3.582-8-8s3.582-8 8-8 8 3.582 8 8-3.582 8-8 8z" />
+            </svg>
+            macOS
+          </div>
+          <div class="platform-badge">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+              <path
+                d="M12.504 0c-.155 0-.311.001-.465.003-.938.012-1.86.086-2.72.249-1.447.275-2.58.803-3.432 1.656C5.035 2.76 4.507 3.893 4.232 5.34c-.163.86-.237 1.782-.249 2.72-.002.154-.003.31-.003.465v6.95c0 .155.001.311.003.465.012.938.086 1.86.249 2.72.275 1.447.803 2.58 1.656 3.432.852.852 1.985 1.38 3.432 1.655.86.163 1.782.237 2.72.249.154.002.31.003.465.003h6.95c.155 0 .311-.001.465-.003.938-.012 1.86-.086 2.72-.249 1.447-.275 2.58-.803 3.432-1.655.852-.852 1.38-1.985 1.655-3.432.163-.86.237-1.782.249-2.72.002-.154.003-.31.003-.465V5.525c0-.155-.001-.311-.003-.465-.012-.938-.086-1.86-.249-2.72-.275-1.447-.803-2.58-1.655-3.432C20.257 2.057 19.124 1.529 17.677 1.253c-.86-.163-1.782-.237-2.72-.249A49.8 49.8 0 0 0 14.492 0h-1.988z" />
+            </svg>
+            Linux
+          </div>
+          <div class="platform-badge">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+              <path
+                d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09l.01-.01zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z" />
+            </svg>
+            iOS
+          </div>
+          <div class="platform-badge">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+              <path
+                d="M17.523 15.34a41.927 41.927 0 01-.67 1.26c-.27.454-.569.896-.9 1.318-.33.423-.693.824-1.093 1.193-.394.37-.823.706-1.29.999-.465.294-.96.542-1.49.738-.533.196-1.1.338-1.7.418-.3.04-.61.061-.916.061-.305 0-.615-.021-.915-.061-.6-.08-1.168-.222-1.7-.418-.533-.196-1.028-.444-1.49-.738-.468-.293-.9-.629-1.29-.999-.403-.369-.766-.77-1.093-1.193-.33-.422-.628-.864-.9-1.318a13.06 13.06 0 01-.67-1.26c-.19-.454-.335-.923-.43-1.4-.095-.48-.14-.965-.14-1.45s.045-.97.14-1.45c.095-.477.24-.946.43-1.4.21-.427.431-.848.67-1.26.272-.454.57-.896.9-1.318.327-.423.69-.824 1.093-1.193.39-.37.822-.706 1.29-.999.462-.294.957-.542 1.49-.738.532-.196 1.1-.338 1.7-.418.3-.04.61-.061.915-.061.306 0 .616.021.916.061.6.08 1.167.222 1.7.418.53.196 1.025.444 1.49.738.467.293.896.629 1.29.999.4.369.763.77 1.093 1.193.331.422.63.864.9 1.318.239.412.46.833.67 1.26.19.454.335.923.43 1.4.095.48.14.965.14 1.45s-.045.97-.14 1.45c-.095.477-.24.946-.43 1.4z" />
+            </svg>
+            Android
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== FEATURES SHOWCASE ===== -->
+    <section class="section">
+      <div class="container">
+        <div class="section-header">
+          <h2>Powerful <span class="text-gradient-accent">Features</span></h2>
+          <p>Everything you need to manage your wallpapers, beautifully organized and fully automated.</p>
+        </div>
+
+        <div class="feature-showcase">
+
+          <!-- Feature 1: Collections Organization -->
+          <div class="feature-showcase-item">
+            <div class="feature-showcase-image">
+              <img src="images/screenshots/screenshot-1.png" alt="Collections Organization">
+            </div>
+            <div class="feature-showcase-content">
+              <div class="feature-showcase-icon">📚</div>
+              <h3>Collections Organization</h3>
+              <p>
+                Organize your wallpapers into categories, albums, and folders.
+                Browse curated collections from remote sources or create your own personalized galleries.
+                Keep everything neat with smart folder views and favorites.
+              </p>
+              <div class="feature-showcase-tags">
+                <span class="feature-tag">📁 Categories</span>
+                <span class="feature-tag">💾 Albums</span>
+                <span class="feature-tag">📂 Folders</span>
+                <span class="feature-tag">⭐ Favorites</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Feature 2: Wallpaper Stylizing -->
+          <div class="feature-showcase-item">
+            <div class="feature-showcase-image">
+              <img src="images/screenshots/screenshot-2.png" alt="Wallpaper Stylizing">
+            </div>
+            <div class="feature-showcase-content">
+              <div class="feature-showcase-icon">🎨</div>
+              <h3>Wallpaper Stylizing</h3>
+              <p>
+                Apply stunning styles to any wallpaper. Choose from Fill, Fit, Stretch, Center, Tile, or Span modes.
+                Extract colors automatically or pick from 132 preset colors to match your aesthetic.
+                Full support for animated GIFs and video wallpapers.
+              </p>
+              <div class="feature-showcase-tags">
+                <span class="feature-tag">🖼️ Multiple Styles</span>
+                <span class="feature-tag">🎬 Video Support</span>
+                <span class="feature-tag">🌈 Auto Colors</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Feature 3: Timer & Automation -->
+          <div class="feature-showcase-item">
+            <div class="feature-showcase-image">
+              <img src="images/screenshots/screenshot-3.png" alt="Timer and Automation">
+            </div>
+            <div class="feature-showcase-content">
+              <div class="feature-showcase-icon">⏰</div>
+              <h3>Timer & Automation</h3>
+              <p>
+                Auto-rotate wallpapers at custom intervals from seconds to hours.
+                Choose sequential or shuffle mode. Run in background with system tray controls on desktop,
+                or notification controls on Android. Multi-monitor support included.
+              </p>
+              <div class="feature-showcase-tags">
+                <span class="feature-tag">🔄 Auto-Rotate</span>
+                <span class="feature-tag">🔀 Shuffle Mode</span>
+                <span class="feature-tag">🖥️ System Tray</span>
+                <span class="feature-tag">🔔 Notifications</span>
+                <span class="feature-tag">📺 Multi-Monitor</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Feature 4: UI Customization -->
+          <div class="feature-showcase-item">
+            <div class="feature-showcase-image">
+              <img src="images/screenshots/screenshot-4.png" alt="UI Customization">
+            </div>
+            <div class="feature-showcase-content">
+              <div class="feature-showcase-icon">✨</div>
+              <h3>UI Customization</h3>
+              <p>
+                Make PALACE truly yours. Switch between light and dark themes,
+                customize fonts and layouts, adjust grid sizes and spacing.
+                Configure gestures, haptic feedback, and more. Every detail is under your control.
+              </p>
+              <div class="feature-showcase-tags">
+                <span class="feature-tag">🌙 Dark Mode</span>
+                <span class="feature-tag">🔤 Custom Fonts</span>
+                <span class="feature-tag">📐 Layouts</span>
+                <span class="feature-tag">👆 Gestures</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== CTA SECTION ===== -->
+    <section class="section">
+      <div class="container text-center">
+        <h2>Ready to Transform Your Desktop?</h2>
+        <p style="max-width: 600px; margin: var(--space-4) auto var(--space-8);">
+          Download PALACE now and bring beauty to your screens. Available on all major platforms.
+        </p>
+        <div class="flex justify-center gap-4 flex-wrap">
+          <button onclick="switchView('download')" class="btn btn-primary btn-lg">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+              <polyline points="7 10 12 15 17 10" />
+              <line x1="12" y1="15" x2="12" y2="3" />
+            </svg>
+            Get PALACE - $5
+          </button>
+          <a href="https://github.com/yoxeric/PALACE" class="btn btn-secondary btn-lg" target="_blank">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+              <path
+                d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
+            </svg>
+            View on GitHub
+          </a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ===== DOWNLOAD VIEW ===== -->
+  <main id="download-view" class="view-section">
+    <section class="section" style="padding-top: calc(var(--header-height) + var(--space-16));">
+      <div class="container text-center">
+        <h1>Download <span class="text-gradient">PALACE</span></h1>
+        <p style="max-width:600px;margin:1rem auto 0;font-size:var(--text-lg)">
+          One-time purchase. All platforms. Lifetime updates.
+        </p>
+      </div>
+    </section>
+
+    <!-- Payment Box -->
+    <section class="section" style="padding-top: 0;" id="payment-section">
+      <div class="payment-box">
+        <h3>Choose Your Plan</h3>
+        <p>Unlock PALACE for all platforms</p>
+
+        <!-- Pricing Toggle -->
+        <div class="pricing-toggle">
+          <button type="button" id="toggle-monthly" onclick="selectPlan('monthly')">Monthly</button>
+          <button type="button" id="toggle-lifetime" class="active" onclick="selectPlan('lifetime')">Lifetime</button>
+        </div>
+
+        <!-- Price Display -->
+        <div class="price-display">
+          <span class="price-amount" id="price-amount">$12</span>
+          <span class="price-period" id="price-period">one-time</span>
+          <div id="savings-badge" class="price-savings">Save 50% vs monthly</div>
+        </div>
+
+        <p id="plan-description"
+          style="font-size: var(--text-sm); color: var(--color-text-muted); margin-bottom: var(--space-4);">
+          Pay once, own forever. Includes all future updates.
+        </p>
+
+        <button onclick="startCheckout()" class="btn btn-primary btn-lg" id="buy-btn" style="width: 100%;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="1" y="4" width="22" height="16" rx="2" ry="2" />
+            <line x1="1" y1="10" x2="23" y2="10" />
+          </svg>
+          <span id="btn-text">Buy Now - $12</span>
+        </button>
+
+        <div class="divider">OR</div>
+
+        <p style="margin-bottom: var(--space-3); font-size: var(--text-sm);">Already purchased?</p>
+        <form class="verify-form" onsubmit="verifyPurchase(event)">
+          <input type="email" id="verify-email" placeholder="Enter your email" required>
+          <button type="submit" class="btn btn-secondary" id="verify-btn">Verify</button>
+        </form>
+        <p class="error-message hidden" id="verify-error"></p>
+      </div>
+    </section>
+
+    <!-- Success Section (hidden by default) -->
+    <section class="section hidden" style="padding-top: 0;" id="success-section">
+      <div class="success-box">
+        <div class="success-icon">🎉</div>
+        <h2>Thank You for Your Purchase!</h2>
+        <p style="color: var(--color-text-muted); margin-bottom: var(--space-6);">
+          Download PALACE for your platform below. Your purchase email: <strong id="purchase-email"></strong>
+        </p>
+      </div>
+
+      <!-- Platform Downloads -->
+      <div class="container">
+        <div class="grid grid-cols-2 gap-8">
+          <!-- Windows -->
+          <div class="platform-card">
+            <div class="platform-header">
+              <div class="platform-icon" style="background:linear-gradient(135deg,#0078d4,#00bcf2)">🪟</div>
+              <div>
+                <h3>Windows</h3>
+                <p>Windows 10 / 11</p>
+              </div>
+            </div>
+            <div class="download-options">
+              <a href="#" class="download-btn">Microsoft Store <span class="badge badge-soon">Soon</span></a>
+              <a href="#" class="download-btn">Direct .exe <span class="badge badge-soon">Soon</span></a>
+              <a href="https://github.com/yoxeric/PALACE/releases" class="download-btn" target="_blank">GitHub
+                Releases</a>
+            </div>
+          </div>
+
+          <!-- macOS -->
+          <div class="platform-card">
+            <div class="platform-header">
+              <div class="platform-icon" style="background:linear-gradient(135deg,#333,#000)">🍎</div>
+              <div>
+                <h3>macOS</h3>
+                <p>macOS 10.14+</p>
+              </div>
+            </div>
+            <div class="download-options">
+              <a href="#" class="download-btn">Mac App Store <span class="badge badge-soon">Soon</span></a>
+              <a href="#" class="download-btn">Direct .dmg <span class="badge badge-soon">Soon</span></a>
+              <a href="https://github.com/yoxeric/PALACE/releases" class="download-btn" target="_blank">GitHub
+                Releases</a>
+            </div>
+          </div>
+
+          <!-- Linux -->
+          <div class="platform-card">
+            <div class="platform-header">
+              <div class="platform-icon" style="background:linear-gradient(135deg,#fcc624,#dd4814)">🐧</div>
+              <div>
+                <h3>Linux</h3>
+                <p>Ubuntu, Fedora, Arch</p>
+              </div>
+            </div>
+            <div class="download-options">
+              <a href="#" class="download-btn">Snap Store <span class="badge badge-soon">Soon</span></a>
+              <a href="#" class="download-btn">Flathub <span class="badge badge-soon">Soon</span></a>
+              <a href="#" class="download-btn">AppImage <span class="badge badge-soon">Soon</span></a>
+              <a href="#" class="download-btn">.deb (Debian) <span class="badge badge-soon">Soon</span></a>
+              <a href="#" class="download-btn">.rpm (Fedora) <span class="badge badge-soon">Soon</span></a>
+              <a href="https://github.com/yoxeric/PALACE/releases" class="download-btn" target="_blank">GitHub
+                Releases</a>
+            </div>
+          </div>
+
+          <!-- Android -->
+          <div class="platform-card">
+            <div class="platform-header">
+              <div class="platform-icon" style="background:linear-gradient(135deg,#3ddc84,#00c853)">🤖</div>
+              <div>
+                <h3>Android</h3>
+                <p>Android 5.0+</p>
+              </div>
+            </div>
+            <div class="download-options">
+              <a href="#" class="download-btn">Google Play <span class="badge badge-soon">Soon</span></a>
+              <a href="#" class="download-btn">Direct APK <span class="badge badge-soon">Soon</span></a>
+              <a href="#" class="download-btn">F-Droid <span class="badge badge-soon">Soon</span></a>
+              <a href="https://github.com/yoxeric/PALACE/releases" class="download-btn" target="_blank">GitHub
+                Releases</a>
+            </div>
+          </div>
+
+          <!-- iOS -->
+          <div class="platform-card" style="grid-column: span 2;">
+            <div class="platform-header">
+              <div class="platform-icon" style="background:linear-gradient(135deg,#007aff,#5856d6)">📱</div>
+              <div>
+                <h3>iOS</h3>
+                <p>iPhone & iPad</p>
+              </div>
+            </div>
+            <div class="download-options" style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-3)">
+              <a href="#" class="download-btn">App Store <span class="badge badge-soon">Soon</span></a>
+              <a href="#" class="download-btn">TestFlight <span class="badge badge-soon">Soon</span></a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Build from Source -->
+    <section class="section" style="background: var(--color-bg-secondary);">
+      <div class="container text-center">
+        <h2>Build From <span class="text-gradient">Source</span></h2>
+        <p style="max-width:600px;margin:1rem auto 1.5rem">PALACE is open source!</p>
+        <div class="card" style="max-width:700px;margin:0 auto;text-align:left">
+          <pre
+            style="background:var(--color-bg);padding:1rem;border-radius:8px;overflow-x:auto;color:var(--color-text-secondary)"><code>git clone https://github.com/yoxeric/PALACE.git
+cd PALACE
+flutter pub get
+flutter run -d windows</code></pre>
+        </div>
+        <a href="https://github.com/yoxeric/PALACE" class="btn btn-primary btn-lg mt-8" target="_blank">View on
+          GitHub</a>
+      </div>
+    </section>
+  </main>
+
+  <!-- ===== LOADING VIEW ===== -->
+  <div id="loading-view">
+    <div class="loader-spinner"></div>
+    <p class="text-loading">Initializing Engine...</p>
+  </div>
+
+  <!-- ===== FOOTER ===== -->
+  <footer class="footer" id="main-footer">
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-brand">
+          <a href="#" onclick="switchView('landing')" class="logo" style="margin-bottom: var(--space-4);">
+            <img src="images/app-icon.png" alt="PALACE Logo">
+            <span>PALACE</span>
+          </a>
+          <p>A beautiful, cross-platform wallpaper manager that brings organization, automation, and beauty to your
+            desktop experience.</p>
+        </div>
+
+        <div class="footer-links">
+          <h4>Product</h4>
+          <ul>
+            <li><a href="#" onclick="switchView('landing')">Home</a></li>
+            <li><a href="#" onclick="switchView('download')">Download</a></li>
+            <li><a href="#" onclick="startFlutterApp()">Web App</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-links">
+          <h4>Resources</h4>
+          <ul>
+            <li><a href="https://github.com/yoxeric/PALACE" target="_blank">GitHub</a></li>
+            <li><a href="https://github.com/yoxeric/PALACE#-usage" target="_blank">Documentation</a></li>
+            <li><a href="https://github.com/yoxeric/PALACE/issues" target="_blank">Report Issue</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-links">
+          <h4>Connect</h4>
+          <ul>
+            <li><a href="https://github.com/yoxeric" target="_blank">@yoxeric</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <p>&copy; 2024 PALACE. Made with ❤️ using Flutter.</p>
+        <div class="social-links">
+          <a href="https://github.com/yoxeric/PALACE" target="_blank" aria-label="GitHub">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+              <path
+                d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
+            </svg>
+          </a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="js/main.js"></script>
+  <script src="flutter.js" defer></script>
+  <script>
+    // Check URL params on load for Stripe success
+    document.addEventListener('DOMContentLoaded', () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const sessionId = urlParams.get('session_id');
+      const verified = urlParams.get('verified');
+      const email = urlParams.get('email');
+
+      if (sessionId || verified === 'true') {
+        // Show success section
+        switchView('download');
+        showSuccessSection(email || 'your purchase email');
+      }
+    });
+
+    // View switching logic
+    function switchView(viewName) {
+      // Update Nav
+      document.querySelectorAll('.nav-link').forEach(el => el.classList.remove('active'));
+      const navId = 'nav-' + (viewName === 'landing' ? 'home' : viewName);
+      const navEl = document.getElementById(navId);
+      if (navEl) navEl.classList.add('active');
+
+      // Switch Content
+      document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
+      const viewEl = document.getElementById(viewName + '-view');
+      if (viewEl) viewEl.classList.add('active');
+
+      // Scroll to top
+      window.scrollTo(0, 0);
+    }
+
+    // Stripe Checkout
+    // ==========================================
+    // CONFIGURATION - Update this with your Cloudflare Worker URL
+    // ==========================================
+    const API_BASE_URL = 'https://palace-api.tricyan3.workers.dev';
+    // For local testing, use: 'http://localhost:8787'
+
+    let selectedPlan = 'lifetime'; // Default to lifetime
+
+    // Plan Selection
+    function selectPlan(plan) {
+      selectedPlan = plan;
+      const monthlyBtn = document.getElementById('toggle-monthly');
+      const lifetimeBtn = document.getElementById('toggle-lifetime');
+      const priceAmount = document.getElementById('price-amount');
+      const pricePeriod = document.getElementById('price-period');
+      const savingsBadge = document.getElementById('savings-badge');
+      const planDescription = document.getElementById('plan-description');
+      const btnText = document.getElementById('btn-text');
+
+      if (plan === 'monthly') {
+        monthlyBtn.classList.add('active');
+        lifetimeBtn.classList.remove('active');
+        priceAmount.textContent = '$2';
+        pricePeriod.textContent = '/month';
+        savingsBadge.style.display = 'none';
+        planDescription.textContent = 'Cancel anytime. Billed monthly.';
+        btnText.textContent = 'Subscribe - $2/month';
+      } else {
+        lifetimeBtn.classList.add('active');
+        monthlyBtn.classList.remove('active');
+        priceAmount.textContent = '$12';
+        pricePeriod.textContent = 'one-time';
+        savingsBadge.style.display = 'inline-block';
+        planDescription.textContent = 'Pay once, own forever. Includes all future updates.';
+        btnText.textContent = 'Buy Now - $12';
+      }
+    }
+
+    async function startCheckout() {
+      const btn = document.getElementById('buy-btn');
+      btn.disabled = true;
+      btn.innerHTML = '<span>Redirecting to Stripe...</span>';
+
+      try {
+        const response = await fetch(`${API_BASE_URL}/api/checkout`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ plan: selectedPlan })
+        });
+
+        const data = await response.json();
+
+        if (data.url) {
+          window.location.href = data.url;
+        } else {
+          throw new Error(data.error || 'Failed to create checkout session');
+        }
+      } catch (error) {
+        console.error('Checkout error:', error);
+        alert('Something went wrong. Please try again.');
+        btn.disabled = false;
+        selectPlan(selectedPlan); // Reset button text
+      }
+    }
+
+    // Verify Purchase
+    async function verifyPurchase(event) {
+      event.preventDefault();
+
+      const email = document.getElementById('verify-email').value;
+      const btn = document.getElementById('verify-btn');
+      const errorEl = document.getElementById('verify-error');
+
+      btn.disabled = true;
+      btn.textContent = 'Verifying...';
+      errorEl.classList.add('hidden');
+
+      try {
+        const response = await fetch(`${API_BASE_URL}/api/verify`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email })
+        });
+
+        const data = await response.json();
+
+        if (data.valid) {
+          showSuccessSection(email);
+        } else {
+          errorEl.textContent = 'No purchase found for this email. Please check and try again.';
+          errorEl.classList.remove('hidden');
+        }
+      } catch (error) {
+        console.error('Verification error:', error);
+        errorEl.textContent = 'Verification failed. Please try again.';
+        errorEl.classList.remove('hidden');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Verify';
+      }
+    }
+
+    // Show Success Section
+    function showSuccessSection(email) {
+      document.getElementById('payment-section').classList.add('hidden');
+      document.getElementById('success-section').classList.remove('hidden');
+      document.getElementById('purchase-email').textContent = email;
+    }
+
+    // App Start Logic
+    async function startFlutterApp() {
+      const loadingView = document.getElementById('loading-view');
+      const landingView = document.getElementById('landing-view');
+      const downloadView = document.getElementById('download-view');
+      const header = document.getElementById('main-header');
+      const footer = document.getElementById('main-footer');
+
+      // Show loading screen immediately
+      if (loadingView) loadingView.style.display = 'flex';
+
+      try {
+        console.log("Loading Flutter engine...");
+
+        // Wait for _flutter to be available if defer script hasn't loaded yet
+        if (typeof _flutter === 'undefined') {
+          await new Promise(resolve => window.addEventListener('load', resolve));
+        }
+
+        if (!window._flutter) {
+          throw new Error('Flutter loader not found');
+        }
+
+        const loader = window._flutter.loader;
+
+        await loader.loadEntrypoint({
+          onEntrypointLoaded: async function (engineInitializer) {
+            console.log("Initializing engine...");
+            const appRunner = await engineInitializer.initializeEngine({
+              renderer: 'canvaskit',
+            });
+
+            console.log("Running app...");
+            await appRunner.runApp();
+
+            // Fade out loading screen
+            if (loadingView) {
+              loadingView.classList.add('fade-out');
+              setTimeout(() => {
+                loadingView.style.display = 'none';
+                if (landingView) landingView.style.display = 'none';
+                if (downloadView) downloadView.style.display = 'none';
+                if (header) header.style.display = 'none';
+                if (footer) footer.style.display = 'none';
+                document.body.classList.add('app-mode');
+              }, 500);
+            }
+          }
+        });
+      } catch (e) {
+        console.error("Error generating app:", e);
+        if (loadingView) loadingView.style.display = 'none';
+        alert("Failed to initialize application. Please reload the page.");
+      }
+    }
+  </script>
+
+</html>

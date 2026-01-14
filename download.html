@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Download PALACE for Windows, macOS, Linux, Android, and iOS.">
+    <title>Download PALACE - All Platforms</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/variables.css">
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="icon" type="image/png" href="images/app-icon.png">
+</head>
+
+<body>
+    <header class="header">
+        <div class="header-content">
+            <a href="index.html" class="logo">
+                <img src="images/app-icon.png" alt="PALACE">
+                <span>PALACE</span>
+            </a>
+            <nav class="nav">
+                <a href="index.html" class="nav-link">Home</a>
+                <a href="download.html" class="nav-link active">Download</a>
+                <a href="app.html" class="btn btn-primary btn-sm">Start Using</a>
+            </nav>
+            <button class="mobile-menu-btn" onclick="toggleMobileMenu()">
+                <span></span><span></span><span></span>
+            </button>
+        </div>
+        <nav class="mobile-nav" id="mobileNav">
+            <a href="index.html" class="nav-link">Home</a>
+            <a href="download.html" class="nav-link active">Download</a>
+            <a href="app.html" class="btn btn-primary" style="margin-top:1rem;width:100%">Start Using</a>
+        </nav>
+    </header>
+
+    <section class="section" style="padding-top: calc(var(--header-height) + var(--space-16));">
+        <div class="container text-center">
+            <h1>Download <span class="text-gradient">PALACE</span></h1>
+            <p style="max-width:600px;margin:1rem auto 0;font-size:var(--text-lg)">
+                Choose your platform. Free and open source.
+            </p>
+        </div>
+    </section>
+
+    <section class="section" style="padding-top: 0;">
+        <div class="container">
+            <div class="grid grid-cols-2 gap-8">
+
+                <!-- Windows -->
+                <div class="platform-card">
+                    <div class="platform-header">
+                        <div class="platform-icon" style="background:linear-gradient(135deg,#0078d4,#00bcf2)">🪟</div>
+                        <div>
+                            <h3>Windows</h3>
+                            <p>Windows 10 / 11</p>
+                        </div>
+                    </div>
+                    <div class="download-options">
+                        <a href="#" class="download-btn">Microsoft Store <span class="badge badge-soon">Soon</span></a>
+                        <a href="#" class="download-btn">Direct .exe <span class="badge badge-soon">Soon</span></a>
+                        <a href="https://github.com/yoxeric/PALACE/releases" class="download-btn"
+                            target="_blank">GitHub Releases</a>
+                    </div>
+                </div>
+
+                <!-- macOS -->
+                <div class="platform-card">
+                    <div class="platform-header">
+                        <div class="platform-icon" style="background:linear-gradient(135deg,#333,#000)">🍎</div>
+                        <div>
+                            <h3>macOS</h3>
+                            <p>macOS 10.14+</p>
+                        </div>
+                    </div>
+                    <div class="download-options">
+                        <a href="#" class="download-btn">Mac App Store <span class="badge badge-soon">Soon</span></a>
+                        <a href="#" class="download-btn">Direct .dmg <span class="badge badge-soon">Soon</span></a>
+                        <a href="https://github.com/yoxeric/PALACE/releases" class="download-btn"
+                            target="_blank">GitHub Releases</a>
+                    </div>
+                </div>
+
+                <!-- Linux -->
+                <div class="platform-card">
+                    <div class="platform-header">
+                        <div class="platform-icon" style="background:linear-gradient(135deg,#fcc624,#dd4814)">🐧</div>
+                        <div>
+                            <h3>Linux</h3>
+                            <p>Ubuntu, Fedora, Arch</p>
+                        </div>
+                    </div>
+                    <div class="download-options">
+                        <a href="#" class="download-btn">Snap Store <span class="badge badge-soon">Soon</span></a>
+                        <a href="#" class="download-btn">Flathub <span class="badge badge-soon">Soon</span></a>
+                        <a href="#" class="download-btn">AppImage <span class="badge badge-soon">Soon</span></a>
+                        <a href="#" class="download-btn">.deb (Debian) <span class="badge badge-soon">Soon</span></a>
+                        <a href="#" class="download-btn">.rpm (Fedora) <span class="badge badge-soon">Soon</span></a>
+                        <a href="https://github.com/yoxeric/PALACE/releases" class="download-btn"
+                            target="_blank">GitHub Releases</a>
+                    </div>
+                </div>
+
+                <!-- Android -->
+                <div class="platform-card">
+                    <div class="platform-header">
+                        <div class="platform-icon" style="background:linear-gradient(135deg,#3ddc84,#00c853)">🤖</div>
+                        <div>
+                            <h3>Android</h3>
+                            <p>Android 5.0+</p>
+                        </div>
+                    </div>
+                    <div class="download-options">
+                        <a href="#" class="download-btn">Google Play <span class="badge badge-soon">Soon</span></a>
+                        <a href="#" class="download-btn">Direct APK <span class="badge badge-soon">Soon</span></a>
+                        <a href="#" class="download-btn">F-Droid <span class="badge badge-soon">Soon</span></a>
+                        <a href="https://github.com/yoxeric/PALACE/releases" class="download-btn"
+                            target="_blank">GitHub Releases</a>
+                    </div>
+                </div>
+
+                <!-- iOS -->
+                <div class="platform-card" style="grid-column: span 2;">
+                    <div class="platform-header">
+                        <div class="platform-icon" style="background:linear-gradient(135deg,#007aff,#5856d6)">📱</div>
+                        <div>
+                            <h3>iOS</h3>
+                            <p>iPhone & iPad</p>
+                        </div>
+                    </div>
+                    <div class="download-options" style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-3)">
+                        <a href="#" class="download-btn">App Store <span class="badge badge-soon">Soon</span></a>
+                        <a href="#" class="download-btn">TestFlight <span class="badge badge-soon">Soon</span></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Build from Source -->
+    <section class="section" style="background: var(--color-bg-secondary);">
+        <div class="container text-center">
+            <h2>Build From <span class="text-gradient">Source</span></h2>
+            <p style="max-width:600px;margin:1rem auto 1.5rem">PALACE is open source!</p>
+            <div class="card" style="max-width:700px;margin:0 auto;text-align:left">
+                <pre
+                    style="background:var(--color-bg);padding:1rem;border-radius:8px;overflow-x:auto;color:var(--color-text-secondary)"><code>git clone https://github.com/yoxeric/PALACE.git
+cd PALACE
+flutter pub get
+flutter run -d windows</code></pre>
+            </div>
+            <a href="https://github.com/yoxeric/PALACE" class="btn btn-primary btn-lg mt-8" target="_blank">View on
+                GitHub</a>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-bottom" style="border-top:none;padding-top:0">
+                <p>&copy; 2024 PALACE. Made with ❤️ using Flutter.</p>
+            </div>
+        </div>
+    </footer>
+    <script src="js/main.js"></script>
+</body>
+
+</html>
